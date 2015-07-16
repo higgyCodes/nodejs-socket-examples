@@ -11,15 +11,24 @@ server = net.createServer(function(connection){
 //reporting
 
 	console.log('Subscriber connected');
-	connection.write("Now watching" + filename + "for changes... \n");
+	connection.write(JSON.stringify({
+		type: 'watching',
+		file: filename
+	}) + '\n ' );
 
 //watcher setup
 let watcher = fs.watch(filename, function(){
-	connection.write("File" + filename + "changed: " + Date.now() + "\n");
+	connection.write(JSON.stringify({
+		type: 'changed',
+		user: 'Grumpy Cat',
+		file: filename,
+		timestamp: Date.now()
+	}) + '\n ' );
+
 });
 
 //
-connnection.on('close', function(){
+connection.on('close', function(){
 	console.log('Subscriber disconnected.');
 	watcher.close();
 
